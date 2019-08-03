@@ -1,20 +1,14 @@
 const express = require("express");
 const actions = require("./helpers/actionModel.js");
 
- const actionsRouter = express.Router();
-
- /*
- get,
-insert,
-update,
-remove,
- */
-
-/*
-Post request needs middleware to checkout for character count (<= 128 characters)
-*/
+const actionsRouter = express.Router();
 
 // url begins with /api/actions
+
+/*
+get, insert, update, remove,
+Post and Put request needs middleware to check for character count (<= 128 characters)
+*/
 
 // CUSTOM MIDDLEWARE ==============
 function charCheck(req, res, next) {
@@ -28,20 +22,20 @@ function charCheck(req, res, next) {
   }
 }
 
+// GET ALL ACTIONS =================
+actionsRouter.get("/", (req, res) => {
+  actions
+    .get()
+    .then(actions => {
+      res.status(200).json(actions);
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ error: "The actions information could not be retrieved." });
+    });
+});
 
- // GET ALL ACTIONS =================
- actionsRouter.get("/", (req, res) => {
-    actions
-      .get()
-      .then(actions => {
-        res.status(200).json(actions);
-      })
-      .catch(err => {
-        res
-          .status(500)
-          .json({ error: "The actions information could not be retrieved." });
-      });
-  });
 // POST  =================
 actionsRouter.post("/", charCheck, (req, res) => {
   const actionInfo = req.body;
@@ -52,9 +46,9 @@ actionsRouter.post("/", charCheck, (req, res) => {
     !actionInfo.notes
   ) {
     res.status(400).json({
-        error:
-          "You must include an action with the required fields: project_id, description, notes."
-      });
+      error:
+        "You must include an action with the required fields: project_id, description, notes."
+    });
   } else {
     actions
       .insert(actionInfo)
@@ -68,6 +62,7 @@ actionsRouter.post("/", charCheck, (req, res) => {
       });
   }
 });
+
 // PUT  =================
 actionsRouter.put("/:id", charCheck, (req, res) => {
   const actionInfo = req.body;
@@ -89,19 +84,19 @@ actionsRouter.put("/:id", charCheck, (req, res) => {
         if (action) {
           res.status(200).json(action);
         } else {
-          res
-            .status(400)
-            .json({ error: "The action with the specified ID does not exist." });
+          res.status(400).json({
+            error: "The action with the specified ID does not exist."
+          });
         }
       })
       .catch(err => {
         res
           .status(500)
-          .json({ 
-            error: "This action's information could not be modified." });
+          .json({ error: "This action's information could not be modified." });
       });
   }
 });
+
 // DELETE  =================
 actionsRouter.delete("/:id", (req, res) => {
   const actionId = req.params.id;
@@ -123,4 +118,4 @@ actionsRouter.delete("/:id", (req, res) => {
     });
 });
 
- module.exports = actionsRouter; 
+module.exports = actionsRouter;
