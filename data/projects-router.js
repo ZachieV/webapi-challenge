@@ -43,7 +43,7 @@ projectsRouter.get("/", (req, res) => {
   });
 
 // POST  =================
-rojectsRouter.post("/", (req, res) => {
+projectsRouter.post("/", (req, res) => {
     const projectInfo = req.body;
     if (!projectInfo || !projectInfo.name || !projectInfo.description) {
       res
